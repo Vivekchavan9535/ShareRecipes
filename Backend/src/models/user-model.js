@@ -8,6 +8,6 @@ const userSchema = new mongoose.Schema({
 	favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }],
 }, { timestamps: true })
 
-const User = mongoose.model("User",userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;
 

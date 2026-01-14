@@ -7,12 +7,14 @@ const userCtlr = {};
 
 
 userCtlr.signup = async (req, res) => {
-	const { username, email, password } = req.body || {};
+	const { username, email, password } = req.body;
 
 
 	try {
+		console.log("Signup Request Body:", req.body);
 		const { value, error } = userSignupValidationSchema.validate({ username, email, password });
 		if (error) {
+			console.log("Signup Validation Error:", error.message);
 			return res.status(400).json({ error: error.message });
 		}
 
@@ -20,6 +22,7 @@ userCtlr.signup = async (req, res) => {
 		if (existingUser) {
 			return res.status(400).json({ error: "User already exists" });
 		}
+
 		const hashPassword = await bcrypt.hash(value.password, 10);
 
 		const user = await User.create({ username: value.username, email: value.email, password: hashPassword });
@@ -46,7 +49,7 @@ userCtlr.login = async (req, res) => {
 			return res.status(403).json({ error: "Invalid email/password" });
 		}
 
-		const token = jwt.sign({ userId: user._id, username: user.username, email: user.email }, "vivek@9535");
+		const token = jwt.sign({ userId: user._id, username: user.username, email: user.email }, process.env.SECRET_KEY);
 		res.json({ token });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
@@ -55,12 +58,21 @@ userCtlr.login = async (req, res) => {
 
 userCtlr.account = async (req, res) => {
 	try {
-		const user = await User.findById(req.userId)
-		res.json(user)
+		const user = await User.findById(req.userId).populate('posts');
+		if (!user) return res.status(404).json({ error: "User not found" });
+
+		const validPosts = user.posts.filter(post => post !== null);
+
+		if (validPosts.length !== user.posts.length) {
+			user.posts = validPosts.map(post => post._id);
+			await user.save();
+		}
+
+		res.json(user);
 	} catch (error) {
-		res.status(500).json({ error: error.message })
+		res.status(500).json({ error: error.message });
 	}
-}
+};
 
 userCtlr.update = async (req, res) => {
 	const { username, email, password } = req.body;
@@ -87,20 +99,44 @@ userCtlr.update = async (req, res) => {
 
 userCtlr.delete = async (req, res) => {
 	try {
-		const user = await User.findByIdAndDelete({ _id: req.userId })
-		if (!user) {
-			return res.status(404).json({ error: "User not found" })
-		}
-		res.json(user)
-	} catch (error) {
-		res.status(500).json({ error: error.message })
-	}
+		const userId = req.userId;
 
-}
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(404).json({ error: "User not found" });
+		}
+
+		const userRecipes = await Recipe.find({ createdBy: userId });
+		const recipesIds = userRecipes.map((recipe) => recipe._id);
+
+
+		await Promise.all([
+			Recipe.deleteMany({ createdBy: userId }),
+
+			User.updateMany(
+				{ favorites: { $in: recipesIds } },
+				{ $pull: { favorites: { $in: recipesIds } } }
+			),
+
+			User.findByIdAndDelete(userId),
+		]);
+
+		res.json("Account and all recipes deleted");
+	} catch (error) {
+		console.error("Delete error:", error);
+		res.status(500).json({ error: "Failed to delete account" });
+	}
+};
 
 userCtlr.favorites = async (req, res) => {
 	try {
-		const user = await User.findById(req.userId).populate('favorites');
+		const user = await User.findById(req.userId).populate({
+			path: 'favorites',
+			populate: {
+				path: 'createdBy',
+				select: 'username'
+			}
+		});
 
 		if (!user) {
 			return res.status(404).json({ error: "User not found" });
@@ -126,7 +162,7 @@ userCtlr.addRemoveFavorite = async (req, res) => {
 			return res.status(404).json({ error: "User not found" });
 		}
 
-		// check if recipe is already in favorites
+
 		const isFavorite = user.favorites.includes(recipeId);
 
 		if (isFavorite) {
@@ -142,10 +178,9 @@ userCtlr.addRemoveFavorite = async (req, res) => {
 	}
 }
 
-//MyPosts CRUD operations;
 userCtlr.myposts = async (req, res) => {
 	try {
-		const posts = await Recipe.find({ createdBy: req.userId });
+		const posts = await Recipe.find({ createdBy: req.userId }).populate("createdBy", "username");
 		if (posts.length === 0) {
 			return res.status(404).json({ error: "You have not posted anything" })
 		}

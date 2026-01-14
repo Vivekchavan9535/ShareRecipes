@@ -3,6 +3,7 @@ import logo from '../assets/logo.png'
 import SearchInput from './SearchInput';
 import { useContext } from 'react';
 import UserContext from '../contexts/userContext';
+import profileImg from "../assets/profileImg.png"
 
 function Navbar() {
     const navigate = useNavigate()
@@ -22,7 +23,7 @@ function Navbar() {
                 <div className='flex gap-5 '>
                     {isLoggedIn && (
                         <div onClick={() => navigate("/profile")} className='h-10 w-10 bg-white rounded-full overflow-hidden cursor-pointer'>
-                            <img className='h-full w-full object-cover' src="https://tinyurl.com/yefpv6z9" alt="" />
+                            <img className='h-full w-full object-cover' src={profileImg} alt="" />
                         </div>
                     )}
                     <li className='text-1xl bg-amber-300 px-4 rounded text-black font-semibold text-center py-2 cursor-pointer hover:bg-amber-400 transition-colors'>

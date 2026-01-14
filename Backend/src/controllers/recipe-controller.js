@@ -14,11 +14,12 @@ recipeCtlr.create = async (req, res) => {
         }
 
         const recipe = await Recipe.create(value);
-        // Fix: Use simple ID, not object
+        const populatedRecipe = await Recipe.findById(recipe._id).populate("createdBy", "username");
+
         const user = await User.findById(createdBy)
         user.posts.push(recipe._id)
         await user.save()
-        res.status(201).json(recipe);
+        res.status(201).json(populatedRecipe);
 
     } catch (error) {
         res.status(500).json({ error: error.message })
@@ -28,10 +29,12 @@ recipeCtlr.create = async (req, res) => {
 
 recipeCtlr.getAll = async (req, res) => {
     try {
-        const recipes = await Recipe.find();
+        const recipes = await Recipe.find().populate("createdBy", "username");
+
         if (recipes.length === 0) {
             return res.status(404).json({ error: "No recipes found" })
         }
+
         res.json(recipes)
     } catch (error) {
         res.status(500).json({ error: error.message })
@@ -40,7 +43,7 @@ recipeCtlr.getAll = async (req, res) => {
 
 recipeCtlr.getOne = async (req, res) => {
     try {
-        const recipe = await Recipe.findById(req.params.id);
+        const recipe = await Recipe.findById(req.params.id).populate("createdBy", "username");
         if (!recipe) return res.status(404).json({ error: "Recipe not found" });
         res.json(recipe);
     } catch (error) {
@@ -55,7 +58,7 @@ recipeCtlr.update = async (req, res) => {
         if (!recipe) {
             return res.status(404).json({ error: "Recipe not found or you are not authorized to edit it" });
         }
-        const updatedRecipe = await Recipe.findByIdAndUpdate(id, req.body, { new: true });
+        const updatedRecipe = await Recipe.findByIdAndUpdate(id, req.body, { new: true }).populate("createdBy", "username");
         res.json(updatedRecipe);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -71,7 +74,10 @@ recipeCtlr.delete = async (req, res) => {
             return res.status(404).json({ error: "Recipe not found or you are not authorized to delete it" });
         }
 
-        await User.findByIdAndUpdate(req.userId, { $pull: { posts: id } });
+        await Promise.all([
+            User.findByIdAndUpdate(req.userId, { $pull: { posts: recipe._id } }),
+            User.updateMany({}, { $pull: { favorites: recipe._id } })
+        ]);
 
         res.json({ message: "Recipe deleted successfully" });
     } catch (error) {
@@ -83,6 +89,11 @@ recipeCtlr.rateRecipe = async (req, res) => {
     const recipeId = req.params.id;
     const userId = req.userId;
     const { value } = req.body;
+
+    if (typeof value !== 'number' || value < 1 || value > 5) {
+        return res.status(400).json({ error: "Rating must be a number between 1 and 5" });
+    }
+
     try {
         const recipe = await Recipe.findById(recipeId)
         if (!recipe) {
@@ -101,10 +112,16 @@ recipeCtlr.rateRecipe = async (req, res) => {
         if (existingRating) {
             existingRating.value = value;
         } else {
-            recipe.ratings.push({ user: userId, value })
+            recipe.ratings.push({ user: userId, value });
         }
-        await recipe.save()
-        res.json(recipe);
+
+        recipe.ratingsCount = recipe.ratings.length;
+        const total = recipe.ratings.reduce((sum, r) => sum + (Number(r.value) || 0), 0);
+        recipe.avgRating = Number((total / recipe.ratingsCount).toFixed(1));
+        await recipe.save();
+
+        const populatedRecipe = await Recipe.findById(recipe._id).populate("createdBy", "username");
+        res.json(populatedRecipe);
 
     } catch (error) {
         res.status(500).json({ error: error.message })

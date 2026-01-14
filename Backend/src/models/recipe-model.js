@@ -10,6 +10,8 @@ const recipeSchema = new mongoose.Schema(
 		instructions: { type: [String], required: true },
 		time: { type: Number, required: true },
 		servings: { type: Number, required: true },
+		avgRating: { type: Number, default: 0 },
+		ratingsCount: { type: Number, default: 0 },
 		level: {
 			type: String,
 			enum: ["easy", "medium", "hard"],

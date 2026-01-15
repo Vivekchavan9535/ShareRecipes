@@ -11,7 +11,6 @@ userCtlr.signup = async (req, res) => {
 
 
 	try {
-		console.log("Signup Request Body:", req.body);
 		const { value, error } = userSignupValidationSchema.validate({ username, email, password });
 		if (error) {
 			console.log("Signup Validation Error:", error.message);

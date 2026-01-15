@@ -55,8 +55,8 @@ function RecipeForm({ initialValues, onSubmit, title = "Share Your Recipe", butt
     };
 
     return (
-        <form onSubmit={formik.handleSubmit} className="bg-yellow-50 border p-5 rounded-lg w-[500px] flex flex-col gap-4 shadow-xl mb-10">
-            <h2 className="text-2xl font-bold text-center text-amber-600 mb-4">{title}</h2>
+        <form onSubmit={formik.handleSubmit} className="bg-white border border-slate-200 p-8 rounded-2xl w-full max-w-[550px] flex flex-col gap-5 shadow-2xl mb-10">
+            <h2 className="text-3xl font-black text-center text-slate-800 mb-2 uppercase tracking-tight">{title}</h2>
 
             {/* Title */}
             <div className="flex flex-col gap-1">
@@ -103,40 +103,40 @@ function RecipeForm({ initialValues, onSubmit, title = "Share Your Recipe", butt
             <div className="flex gap-2">
                 <div className="flex-1 flex flex-col gap-1">
                     <input
-                        className={`border p-2 rounded outline-amber-400 text-sm w-full ${formik.touched.servings && formik.errors.servings ? 'border-red-500' : ''}`}
+                        className={`border border-slate-200 p-3 rounded-xl outline-emerald-500 text-sm w-full transition-all ${formik.touched.servings && formik.errors.servings ? 'border-red-500' : 'focus:border-emerald-500'}`}
                         type="number"
                         name="servings"
-                        placeholder="Enter Serving"
+                        placeholder="Servings (e.g. 4)"
                         value={formik.values.servings}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    {formik.touched.servings && formik.errors.servings && <span className="text-red-500 text-[10px]">{formik.errors.servings}</span>}
+                    {formik.touched.servings && formik.errors.servings && <span className="text-red-500 text-[10px] ml-1">{formik.errors.servings}</span>}
                 </div>
                 <div className="flex-1 flex flex-col gap-1">
                     <input
-                        className={`border p-2 rounded outline-amber-400 text-sm w-full ${formik.touched.time && formik.errors.time ? 'border-red-500' : ''}`}
+                        className={`border border-slate-200 p-3 rounded-xl outline-emerald-500 text-sm w-full transition-all ${formik.touched.time && formik.errors.time ? 'border-red-500' : 'focus:border-emerald-500'}`}
                         type="number"
                         name="time"
-                        placeholder="Enter Minutes"
+                        placeholder="Minutes (e.g. 30)"
                         value={formik.values.time}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    {formik.touched.time && formik.errors.time && <span className="text-red-500 text-[10px]">{formik.errors.time}</span>}
+                    {formik.touched.time && formik.errors.time && <span className="text-red-500 text-[10px] ml-1">{formik.errors.time}</span>}
                 </div>
             </div>
 
             {/* Ingredients Section */}
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center px-1">
-                    <label className="font-semibold text-xs text-gray-700">Ingredients</label>
-                    <button type="button" onClick={() => addArrayItem("ingredients")} className="bg-amber-400 text-[10px] px-2 py-1 rounded-full font-bold shadow-sm">+</button>
+                    <label className="font-bold text-xs uppercase tracking-widest text-slate-500">Ingredients</label>
+                    <button type="button" onClick={() => addArrayItem("ingredients")} className="bg-emerald-500 text-white text-[10px] px-2 py-1 rounded-lg font-black shadow-md hover:bg-emerald-600 transition-colors">+</button>
                 </div>
                 {formik.values.ingredients.map((ing, i) => (
                     <div key={i} className="flex gap-2 items-center">
                         <input
-                            className="border p-2 rounded text-sm outline-amber-400 flex-1"
+                            className="border border-slate-200 p-3 rounded-xl text-sm outline-emerald-500 flex-1 focus:border-emerald-500 transition-all"
                             type="text"
                             placeholder={`Ingredient ${i + 1}`}
                             value={ing}
@@ -152,8 +152,8 @@ function RecipeForm({ initialValues, onSubmit, title = "Share Your Recipe", butt
             {/* Instructions Section */}
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center px-1">
-                    <label className="font-semibold text-xs text-gray-700">Instructions</label>
-                    <button type="button" onClick={() => addArrayItem("instructions")} className="bg-amber-400 text-[10px] px-2 py-1 rounded-full font-bold shadow-sm">+</button>
+                    <label className="font-bold text-xs uppercase tracking-widest text-slate-500">Instructions</label>
+                    <button type="button" onClick={() => addArrayItem("instructions")} className="bg-emerald-500 text-white text-[10px] px-2 py-1 rounded-lg font-black shadow-md hover:bg-emerald-600 transition-colors">+</button>
                 </div>
                 {formik.values.instructions.map((ins, i) => (
                     <div key={i} className="flex gap-2 items-center">
@@ -187,7 +187,7 @@ function RecipeForm({ initialValues, onSubmit, title = "Share Your Recipe", butt
 
             {/* Submit Button */}
             <input
-                className="bg-amber-400 py-2 font-bold rounded-full hover:bg-amber-500 active:scale-95 transition-all cursor-pointer shadow-md mt-2"
+                className="bg-emerald-600 py-3 text-white font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer shadow-lg mt-4 border-none"
                 type="submit"
                 value={buttonText}
             />

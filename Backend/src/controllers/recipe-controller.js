@@ -4,6 +4,28 @@ import { recipeValidationSchema } from "../validations/recipe-validation.js";
 
 const recipeCtlr = {};
 
+
+recipeCtlr.search = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q || q.trim() === "") {
+            return res.json([]);
+        }
+
+        const recipes = await Recipe.find({
+            $or: [
+                { title: { $regex: q, $options: 'i' } },
+                { ingredients: { $regex: q, $options: 'i' } },
+                { category: { $regex: q, $options: 'i' } }
+            ]
+        }).populate("createdBy", "username");
+
+        res.json(recipes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 recipeCtlr.create = async (req, res) => {
     const body = req.body;
     try {
@@ -127,5 +149,7 @@ recipeCtlr.rateRecipe = async (req, res) => {
         res.status(500).json({ error: error.message })
     }
 }
+
+
 
 export default recipeCtlr;

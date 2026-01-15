@@ -35,9 +35,9 @@ function ProfileCard({ user }) {
                     />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-800">{user.username}</h2>
-                    <p className="text-gray-500">{user.email}</p>
-                    <div className="mt-2 text-sm text-amber-600 font-medium">
+                    <h2 className="text-2xl font-bold text-slate-900">{user.username}</h2>
+                    <p className="text-slate-500 font-medium">{user.email}</p>
+                    <div className="mt-2 text-[10px] uppercase tracking-wider bg-amber-50 text-amber-700 px-2 py-0.5 rounded-md font-black w-fit">
                         Member since {new Date(user.createdAt).toLocaleDateString()}
                     </div>
                 </div>
@@ -64,7 +64,7 @@ function ProfileCard({ user }) {
             <div className="mt-6 flex flex-col gap-2">
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="w-full py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                    className="w-full py-2.5 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-md active:scale-95"
                 >
                     Edit Profile
                 </button>
@@ -112,7 +112,7 @@ function ProfileCard({ user }) {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600"
+                                    className="flex-1 py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition-all shadow-lg"
                                 >
                                     Save
                                 </button>

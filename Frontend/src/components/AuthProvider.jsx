@@ -7,19 +7,21 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const userReducer = (state, action) => {
 	switch (action.type) {
+		case "SET_LOADING":
+			return { ...state, loading: action.payload };
 		case "LOGIN":
-			return { ...state, isLoggedIn: true, user: action.payload, serverErrors: "" };
+			return { ...state, isLoggedIn: true, user: action.payload, serverErrors: "", loading: false };
 		case "LOGOUT":
-			return { ...state, isLoggedIn: false, user: null, serverErrors: "" };
+			return { ...state, isLoggedIn: false, user: null, serverErrors: "", loading: false };
 		case "SERVER_ERRORS":
-			return { ...state, serverErrors: action.payload };
+			return { ...state, serverErrors: action.payload, loading: false };
 		default:
 			return state;
 	}
 }
 
 function AuthProvider({ children }) {
-	const [userState, userDispatch] = useReducer(userReducer, { user: null, isLoggedIn: false, serverErrors: "", loading: false });
+	const [userState, userDispatch] = useReducer(userReducer, { user: null, isLoggedIn: false, serverErrors: "", loading: true });
 	const navigate = useNavigate()
 
 	const fetchAccount = async () => {
@@ -32,6 +34,8 @@ function AuthProvider({ children }) {
 				localStorage.removeItem("token")
 				userDispatch({ type: "SERVER_ERRORS", payload: error?.response?.data?.error })
 			}
+		} else {
+			userDispatch({ type: "SET_LOADING", payload: false });
 		}
 	};
 

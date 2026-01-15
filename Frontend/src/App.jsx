@@ -17,6 +17,8 @@ import RecipeDetails from "./pages/RecipeDetails";
 import EditRecipe from "./pages/EditRecipe";
 
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
 	const { isLoggedIn } = useContext(UserContext)
 	const dispatch = useDispatch()
@@ -32,7 +34,18 @@ function App() {
 
 	return (
 		<>
-			<ToastContainer />
+			<ToastContainer
+				position="top-center"
+				autoClose={1500}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="dark"
+			/>
 			<Navbar />
 			<div className="pt-20">
 
@@ -40,12 +53,14 @@ function App() {
 					<Route path="/login" element={<Login />} />
 					<Route path="/signup" element={<Signup />} />
 					<Route path="/" element={<Home />} />
-					<Route path="/profile" element={<Profile />} />
-					<Route path="/myposts" element={<MyPosts />} />
-					<Route path="/favorites" element={<Favorites />} />
-					<Route path="/post-recipe" element={<PostRecipe />} />
-					<Route path='/recipe/:id' element={<RecipeDetails />} />
-					<Route path='/edit-recipe/:id' element={<EditRecipe />} />
+
+					{/* Protected Routes */}
+					<Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+					<Route path="/myposts" element={<ProtectedRoute><MyPosts /></ProtectedRoute>} />
+					<Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+					<Route path="/post-recipe" element={<ProtectedRoute><PostRecipe /></ProtectedRoute>} />
+					<Route path='/edit-recipe/:id' element={<ProtectedRoute><EditRecipe /></ProtectedRoute>} />
+					<Route path='/recipe/:id' element={<ProtectedRoute><RecipeDetails /></ProtectedRoute>} />
 				</Routes>
 			</div>
 		</>

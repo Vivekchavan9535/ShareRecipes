@@ -30,7 +30,7 @@ function Home() {
 		<main>
 			<button
 				onClick={handleShareRecipe}
-				className="bg-yellow-400 hover:bg-yellow-500 transition-colors text-black font-semibold px-6 py-2 ml-10 rounded-full shadow-md"
+				className="bg-yellow-400 hover:bg-yellow-500 transition-colors text-black font-semibold px-6 py-2 mt-5 ml-10 rounded-full shadow-md"
 			>
 				Share Your Recipe
 			</button>

@@ -28,6 +28,7 @@ app.get("/user/favorites", userAuthentication, userCtlr.favorites);
 app.put("/user/favorites/:id", userAuthentication, userCtlr.addRemoveFavorite);
 
 //recipes
+app.get("/recipes/search", recipeCtlr.search)
 app.post("/recipes", userAuthentication, recipeCtlr.create);
 app.get("/recipes", recipeCtlr.getAll);
 app.get("/recipes/:id", recipeCtlr.getOne);

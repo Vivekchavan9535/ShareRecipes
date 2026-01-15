@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png'
-import SearchInput from './SearchInput';
+import SearchInput from '././SearchInput';
 import { useContext } from 'react';
 import UserContext from '../contexts/userContext';
 import profileImg from "../assets/profileImg.png"
@@ -11,26 +11,36 @@ function Navbar() {
 
 
     return (
-        <nav className="bg-black text-white  z-10 w-full fixed">
-            <ul className='flex items-center justify-between px-5'>
+        <nav className="bg-slate-900/95 backdrop-blur-md text-white z-20 w-full fixed shadow-lg border-b border-white/5">
+            <ul className='flex items-center justify-between px-6 py-3'>
                 <li>
-                    <img onClick={() => navigate("/")} className='h-15 cursor-pointer' src={logo} alt="" />
+                    <img onClick={() => navigate("/")} className='h-12 cursor-pointer hover:opacity-80 transition-opacity' src={logo} alt="Logo" />
                 </li>
-                <li>
+                <li className="flex-1 max-w-2xl mx-10">
                     <SearchInput />
                 </li>
 
-                <div className='flex gap-5 '>
+                <div className='flex items-center gap-6 '>
                     {isLoggedIn && (
-                        <div onClick={() => navigate("/profile")} className='h-10 w-10 bg-white rounded-full overflow-hidden cursor-pointer'>
-                            <img className='h-full w-full object-cover' src={profileImg} alt="" />
+                        <div onClick={() => navigate("/profile")} className='h-10 w-10 ring-2 ring-emerald-500/20 rounded-full overflow-hidden cursor-pointer hover:ring-emerald-500/50 transition-all'>
+                            <img className='h-full w-full object-cover' src={profileImg} alt="Profile" />
                         </div>
                     )}
-                    <li className='text-1xl bg-amber-300 px-4 rounded text-black font-semibold text-center py-2 cursor-pointer hover:bg-amber-400 transition-colors'>
+                    <li className=''>
                         {isLoggedIn ? (
-                            <button onClick={handleLogout}>Logout</button>
+                            <button
+                                onClick={handleLogout}
+                                className="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2 rounded-full font-bold text-sm transition-all shadow-md active:scale-95"
+                            >
+                                Logout
+                            </button>
                         ) : (
-                            <button onClick={() => navigate("/login")}>Login</button>
+                            <button
+                                onClick={() => navigate("/login")}
+                                className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-bold text-sm transition-all shadow-md active:scale-95"
+                            >
+                                Login
+                            </button>
                         )}
                     </li>
                 </div>

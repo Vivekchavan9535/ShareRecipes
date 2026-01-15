@@ -31,7 +31,7 @@ function RecipeDetails() {
     const handleDelete = async (id) => {
         try {
             await dispatch(deleteRecipe(id)).unwrap()
-            await fetchAccount();W
+            await fetchAccount();
             toast("Successfully deleted")
             navigate("/myposts")
         } catch (error) {
@@ -59,7 +59,7 @@ function RecipeDetails() {
             <div className="border-b pb-4 mb-6 flex justify-between items-start">
                 <div className="flex-1">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-3xl font-bold text-gray-800">{recipe.title}</h1>
+                        <h1 className="text-3xl font-bold text-slate-900">{recipe.title}</h1>
                         <div className="flex items-center gap-2">
                             {user && !isOwner && (
                                 <button
@@ -67,11 +67,11 @@ function RecipeDetails() {
                                     className={`text-2xl transition-transform hover:scale-110`}
                                     title={isFavorite ? "Remove from favorites" : "Add to favorites"}
                                 >
-                                    {isFavorite ? <span className="bg-amber-100 text-amber-600 px-2 py-1 rounded text-sm font-bold flex items-center gap-1">Remove from Favorites</span> : <span className="bg-amber-100 text-amber-600 px-2 py-1 rounded text-sm font-bold flex items-center gap-1">Add to Favorites</span>}
+                                    {isFavorite ? <span className="bg-rose-50 text-rose-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-1 border border-rose-100">Remove from Favorites</span> : <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-1 border border-emerald-100">Add to Favorites</span>}
                                 </button>
                             )}
                             {recipe.avgRating > 0 && (
-                                <span className="bg-amber-100 text-amber-600 px-2 py-1 rounded text-sm font-bold flex items-center gap-1">
+                                <span className="bg-amber-50 text-amber-700 px-2 py-1 rounded-md text-xs font-black uppercase tracking-tighter flex items-center gap-1">
                                     ⭐ {recipe.avgRating} ({recipe.ratingsCount})
                                 </span>
                             )}
@@ -91,7 +91,7 @@ function RecipeDetails() {
                         <div className="flex gap-3">
                             <button
                                 onClick={() => navigate(`/edit-recipe/${id}`)}
-                                className="bg-amber-400 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-bold transition-colors"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md active:scale-95"
                             >
                                 Edit Recipe
                             </button>
@@ -137,7 +137,7 @@ function RecipeDetails() {
             <div className="grid md:grid-cols-2 gap-10">
                 {/* Ingredients */}
                 <div>
-                    <h2 className="text-xl font-bold mb-4 border-l-4 border-yellow-400 pl-3">Ingredients</h2>
+                    <h2 className="text-xl font-black mb-4 border-l-4 border-emerald-500 pl-3 uppercase tracking-tight text-slate-800">Ingredients</h2>
                     <ul className="list-disc list-inside space-y-2 text-gray-700">
                         {recipe.ingredients.map((ing, i) => (
                             <li key={i}>{ing}</li>
@@ -147,7 +147,7 @@ function RecipeDetails() {
 
                 {/* Instructions */}
                 <div>
-                    <h2 className="text-xl font-bold mb-4 border-l-4 border-yellow-400 pl-3">Instructions</h2>
+                    <h2 className="text-xl font-black mb-4 border-l-4 border-emerald-500 pl-3 uppercase tracking-tight text-slate-800">Instructions</h2>
                     <div className="space-y-4">
                         {recipe.instructions.map((step, i) => (
                             <div key={i} className="flex gap-3">

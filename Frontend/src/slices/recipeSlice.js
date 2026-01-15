@@ -13,6 +13,15 @@ export const fetchRecipes = createAsyncThunk("recipes/fetchRecipes", async (_, {
     }
 })
 
+export const searchRecipes = createAsyncThunk("recipes/searchRecipes", async (query, { rejectWithValue }) => {
+    try {
+        const res = await axios.get(`/recipes/search?q=${query}`)
+        return res.data
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.error || "Something went wrong")
+    }
+})
+
 
 export const createRecipe = createAsyncThunk("recipes/createRecipe", async (formData, { rejectWithValue, dispatch }) => {
     try {
@@ -80,6 +89,18 @@ const recipes = createSlice({
                 state.data = action.payload;
             })
             .addCase(fetchRecipes.rejected, (state, action) => {
+                state.loading = false;
+                state.serverError = action.payload;
+            })
+            .addCase(searchRecipes.pending, (state) => {
+                state.loading = true;
+                state.serverError = null;
+            })
+            .addCase(searchRecipes.fulfilled, (state, action) => {
+                state.loading = false;
+                state.data = action.payload;
+            })
+            .addCase(searchRecipes.rejected, (state, action) => {
                 state.loading = false;
                 state.serverError = action.payload;
             })

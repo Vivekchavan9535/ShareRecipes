@@ -3,8 +3,7 @@ import userCtlr from './src/controllers/user-controller.js'
 import recipeCtlr from "./src/controllers/recipe-controller.js"
 import userAuthentication from './src/middlewares/userAuthentication.js'
 import express from 'express';
-import cors from "cors"
-import { Server } from "socket.io";
+import cors from "cors";
 const app = express();
 const port = process.env.PORT || 8080;
 

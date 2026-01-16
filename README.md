@@ -4,6 +4,13 @@ A full-stack Recipe Sharing platform where users can create recipes, add favorit
 
 ---
 
+## 🌐 Live Demo (Deployed Links)
+
+✅ **Frontend (Vercel):** https://share-recipio.vercel.app/  
+✅ **Backend (Render):** https://sharerecipes.onrender.com/
+
+---
+
 ## 🚀 Features
 
 ### ✅ Authentication

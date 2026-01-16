@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux"
-import RecipeCard from "../components/recipeCard"
+import RecipeCard from "../components/RecipeCard"
 import UserContext from "../contexts/userContext"
 import { useNavigate } from "react-router-dom"
 import { useContext } from "react"

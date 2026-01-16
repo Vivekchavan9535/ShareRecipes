@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import RecipeCard from "../components/recipeCard";
+import RecipeCard from "../components/RecipeCard";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { useEffect } from "react";

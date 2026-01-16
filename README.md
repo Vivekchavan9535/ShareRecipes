@@ -156,7 +156,6 @@ POST /signup
 Body
 
 json
-Copy code
 {
   "username": "Vivek",
   "email": "vivek@gmail.com",
@@ -168,7 +167,6 @@ POST /login
 Body
 
 json
-Copy code
 {
   "email": "vivek@gmail.com",
   "password": "123456"
@@ -176,7 +174,6 @@ Copy code
 ✅ Response
 
 json
-Copy code
 {
   "token": "JWT_TOKEN"
 }
@@ -184,7 +181,6 @@ Copy code
 Send token in headers:
 
 json
-Copy code
 {
   "Authorization": "JWT_TOKEN"
 }
@@ -237,7 +233,6 @@ PUT /recipes/:id/rating
 Body
 
 json
-Copy code
 {
   "value": 4
 }
@@ -245,7 +240,7 @@ Copy code
 Recipes are ranked using:
 
 js
-Copy code
 .sort({ ratingsCount: -1, avgRating: -1 })
+
 👤 Author
 Vivek Chavan

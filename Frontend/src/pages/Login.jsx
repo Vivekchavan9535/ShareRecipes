@@ -27,7 +27,7 @@ function Login() {
 
 	const demoUsers = [
 		{ label: "Demo User 1", email: "vivekchavan942@gmail.com", password: "vivek123" },
-		{ label: "Demo User 2", email: "jassy@gmail.com", password: "puttu123" },
+		{ label: "Demo User 2", email: "jassy@gmail.com", password: "jassy123" },
 		{ label: "Demo User 3", email: "puttu@gmail.com", password: "puttu123" },
 	];
 

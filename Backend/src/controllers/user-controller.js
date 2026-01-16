@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Recipe from '../models/recipe-model.js';
 import User from '../models/user-model.js'
 import { userSignupValidationSchema, userLoginValidationSchema, userUpdateValidationSchema } from "../validations/user-validation.js"
@@ -8,8 +9,6 @@ const userCtlr = {};
 
 userCtlr.signup = async (req, res) => {
 	const { username, email, password } = req.body;
-
-
 	try {
 		const { value, error } = userSignupValidationSchema.validate({ username, email, password });
 		if (error) {
@@ -21,9 +20,7 @@ userCtlr.signup = async (req, res) => {
 		if (existingUser) {
 			return res.status(400).json({ error: "User already exists" });
 		}
-
 		const hashPassword = await bcrypt.hash(value.password, 10);
-
 		const user = await User.create({ username: value.username, email: value.email, password: hashPassword });
 		res.json({ message: "User registered successfully" });
 	} catch (error) {
@@ -57,7 +54,7 @@ userCtlr.login = async (req, res) => {
 
 userCtlr.account = async (req, res) => {
 	try {
-		const user = await User.findById(req.userId).populate('posts');
+		const user = await User.findById(req.userId).populate('posts').select('-password');
 		if (!user) return res.status(404).json({ error: "User not found" });
 
 		const validPosts = user.posts.filter(post => post !== null);
@@ -96,34 +93,44 @@ userCtlr.update = async (req, res) => {
 	}
 }
 
+
+
 userCtlr.delete = async (req, res) => {
+	const session = await mongoose.startSession();
+
 	try {
-		const userId = req.userId;
+		await session.withTransaction(async () => {
+			const userId = req.userId;
 
-		const user = await User.findById(userId);
-		if (!user) {
-			return res.status(404).json({ error: "User not found" });
-		}
+			const user = await User.findById(userId).session(session);
+			if (!user) {
+				throw new Error("User not found");
+			}
 
-		const userRecipes = await Recipe.find({ createdBy: userId });
-		const recipesIds = userRecipes.map((recipe) => recipe._id);
+			const recipes = await Recipe.find({ createdBy: userId }).select('_id').session(session);
+			const recipeIds = recipes.map(recipe => recipe._id);
 
+			if (recipeIds.length > 0) {
+				await Recipe.deleteMany({ _id: { $in: recipeIds } }).session(session);
+			}
 
-		await Promise.all([
-			Recipe.deleteMany({ createdBy: userId }),
+			if (recipeIds.length > 0) {
+				await User.updateMany(
+					{ favorites: { $in: recipeIds } },
+					{ $pull: { favorites: { $in: recipeIds } } },
+					{ session }
+				);
+			}
+			await User.findByIdAndDelete(userId).session(session);
+		});
 
-			User.updateMany(
-				{ favorites: { $in: recipesIds } },
-				{ $pull: { favorites: { $in: recipesIds } } }
-			),
+		session.endSession();
+		res.json({ message: "Account and all associated data deleted successfully" });
 
-			User.findByIdAndDelete(userId),
-		]);
-
-		res.json("Account and all recipes deleted");
 	} catch (error) {
-		console.error("Delete error:", error);
-		res.status(500).json({ error: "Failed to delete account" });
+		await session.abortTransaction();
+		session.endSession();
+		res.status(500).json({ error: error.message });
 	}
 };
 
@@ -162,7 +169,8 @@ userCtlr.addRemoveFavorite = async (req, res) => {
 		}
 
 
-		const isFavorite = user.favorites.includes(recipeId);
+		const isFavorite = user.favorites.some((id) => id.toString() === recipeId);
+
 
 		if (isFavorite) {
 			await User.findByIdAndUpdate(userId, { $pull: { favorites: recipeId } });
@@ -181,7 +189,7 @@ userCtlr.myposts = async (req, res) => {
 	try {
 		const posts = await Recipe.find({ createdBy: req.userId }).populate("createdBy", "username");
 		if (posts.length === 0) {
-			return res.status(404).json({ error: "You have not posted anything" })
+			return res.json([])
 		}
 		res.json(posts)
 	} catch (error) {

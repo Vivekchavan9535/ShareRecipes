@@ -43,7 +43,6 @@ function Favorites() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {favorites.map((recipe) => (
                         <RecipeCard
-                            onclick={() => navigate(`/recipe/${recipe._id}`)}
                             key={recipe._id}
                             recipes={recipe}
                         />

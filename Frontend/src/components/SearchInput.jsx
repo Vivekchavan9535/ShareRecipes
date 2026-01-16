@@ -1,34 +1,28 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
+import { useSearchParams } from "react-router-dom";
 import { fetchRecipes, searchRecipes } from "../slices/recipeSlice";
 
 function SearchInput() {
     const [searchText, setSearchText] = useState("");
-
-    const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const [searchParams] = useSearchParams();
+    const category = searchParams.get("category") || "All";
 
     useEffect(() => {
         const timer = setTimeout(() => {
             if (searchText.trim()) {
                 dispatch(searchRecipes(searchText.trim()));
             } else {
-                dispatch(fetchRecipes());
+                if (category === "All") {
+                    dispatch(fetchRecipes());
+                }
             }
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchText, dispatch]);
-
-    const handleChange = (e) => {
-        setSearchText(e.target.value);
-    };
-
-    const handleClear = () => {
-        setSearchText("");
-        dispatch(fetchRecipes());
-    };
+    }, [searchText, category, dispatch]);
 
     return (
         <main className="w-full flex flex-col justify-center gap-5">
@@ -37,8 +31,7 @@ function SearchInput() {
                 type="search"
                 placeholder="Search recipes..."
                 value={searchText}
-                onChange={handleChange}
-
+                onChange={(e) => setSearchText(e.target.value)}
             />
         </main>
     );

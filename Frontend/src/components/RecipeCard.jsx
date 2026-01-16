@@ -1,19 +1,33 @@
 import { useContext } from "react";
 import UserContext from "../contexts/userContext";
+import { useNavigate } from "react-router-dom";
 
 const url = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
 
 
 function RecipeCard({ recipes, onclick }) {
-	const { user } = useContext(UserContext);
+	const { user, isLoggedIn } = useContext(UserContext);
+	const navigate = useNavigate()
 
 	const creatorId = typeof recipes.createdBy === 'object' ? recipes.createdBy?._id : recipes.createdBy;
 	const creatorName = typeof recipes.createdBy === 'object' ? recipes.createdBy?.username : null;
 
 	const displayName = (user && user._id === creatorId) ? "You" : (creatorName || "Unknown");
 
+	const handleOpen = () => {
+		const detailsPath = `/recipes/${recipes._id}`;
+
+		if (!isLoggedIn) {
+			navigate(`/login?redirect=${encodeURIComponent(detailsPath)}`);
+			return;
+		}
+
+		navigate(detailsPath);
+	};
+
+
 	return (
-		<main onClick={() => onclick()} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group">
+		<main onClick={handleOpen} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group">
 
 			<section className="h-48 w-full bg-gray-200 overflow-hidden relative">
 

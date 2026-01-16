@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserContext from "../contexts/userContext";
 import { deleteRecipe } from "../slices/recipeSlice";
 import { toast } from "react-toastify";
 import axios from "../config/axios";
 import Rate from "../components/Rate";
+
 
 function RecipeDetails() {
     const { id } = useParams();
@@ -13,12 +14,23 @@ function RecipeDetails() {
     const { user, fetchAccount } = useContext(UserContext);
     const dispatch = useDispatch()
 
-    const recipe = useSelector((state) =>
-        state.recipes.data.find((r) => r._id === id)
-    );
 
-    if (!recipe) {
-        return <div className="p-10 text-center">Recipe not found!</div>;
+
+    const { data: recipes, loading } = useSelector((state) => state.recipes);
+    const recipe = recipes.find((r) => r._id === id);
+
+    useEffect(() => {
+        if (!recipe && !loading) {
+            dispatch(fetchRecipes());
+        }
+    }, [recipe, loading, dispatch]);
+
+    if (loading) {
+        return <div className="p-10 text-center text-emerald-600 font-bold animate-pulse">Loading recipe details...</div>;
+    }
+
+    if (!recipe && !loading) {
+        return <div className="p-10 text-center text-rose-500 font-bold">Recipe not found!</div>;
     }
 
     const isOwner = user && (
@@ -51,7 +63,13 @@ function RecipeDetails() {
         }
     };
 
-    const userRating = recipe.ratings?.find(r => r.user === user?._id)?.value || 0;
+
+    const userRating = recipe.ratings?.find((r) => r.user?.toString() === user?._id)?.value || 0;
+
+
+
+
+
 
     return (
         <main className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">

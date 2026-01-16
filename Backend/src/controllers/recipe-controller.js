@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Recipe from "../models/recipe-model.js"
 import User from "../models/user-model.js";
 import { recipeValidationSchema } from "../validations/recipe-validation.js";
@@ -51,7 +52,7 @@ recipeCtlr.create = async (req, res) => {
 
 recipeCtlr.getAll = async (req, res) => {
     try {
-        const recipes = await Recipe.find().populate("createdBy", "username");
+        const recipes = await Recipe.find().sort({ ratingsCount: -1, avgRating: -1 }).populate("createdBy", "username");
 
         if (recipes.length === 0) {
             return res.status(404).json({ error: "No recipes found" })
@@ -88,67 +89,115 @@ recipeCtlr.update = async (req, res) => {
 }
 
 recipeCtlr.delete = async (req, res) => {
+    const session = await mongoose.startSession()
     try {
-        const id = req.params.id;
-        const recipe = await Recipe.findOneAndDelete({ _id: id, createdBy: req.userId });
+        await session.withTransaction(async () => {
+            const id = req.params.id;
+            const deletedRecipe = await Recipe.findOneAndDelete({ _id: id, createdBy: req.userId }, { session });
 
-        if (!recipe) {
-            return res.status(404).json({ error: "Recipe not found or you are not authorized to delete it" });
-        }
+            if (!deletedRecipe) {
+                throw new Error("Recipe not found or unauthorized");
+            }
 
-        await Promise.all([
-            User.findByIdAndUpdate(req.userId, { $pull: { posts: recipe._id } }),
-            User.updateMany({}, { $pull: { favorites: recipe._id } })
-        ]);
+            await User.findByIdAndUpdate(req.userId, { $pull: { posts: deletedRecipe._id } }, { session })
+            await User.updateMany({}, { $pull: { favorites: deletedRecipe._id } }, { session })
+        })
 
+        session.endSession();
         res.json({ message: "Recipe deleted successfully" });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         res.status(500).json({ error: error.message });
     }
 }
 
+
+
 recipeCtlr.rateRecipe = async (req, res) => {
     const recipeId = req.params.id;
-    const userId = req.userId;
+    const userId = new mongoose.Types.ObjectId(req.userId);
     const { value } = req.body;
+
 
     if (typeof value !== 'number' || value < 1 || value > 5) {
         return res.status(400).json({ error: "Rating must be a number between 1 and 5" });
     }
 
     try {
-        const recipe = await Recipe.findById(recipeId)
-        if (!recipe) {
-            return res.status(404).json({ error: "Recipe not found" });
+        const recipeCheck = await Recipe.findOne({
+            _id: recipeId,
+            createdBy: { $ne: userId }  // REMOVED extra { } around userId
+        });
+
+        if (!recipeCheck) {
+            return res.status(404).json({
+                error: "Recipe not found or you can't rate your own recipe"
+            });
         }
 
-        if (recipe.createdBy.toString() === userId) {
-            return res.status(400).json({ error: "You can't rate yourself" })
-        }
 
-        const existingRating = recipe.ratings.find((r) => {
-            return r.user && r.user.toString() === userId;
-        })
+        const updatedRecipe = await Recipe.findOneAndUpdate(
+            { _id: recipeId },
+            [
+                {
+                    $set: {
+                        ratings: {
+                            $cond: [
 
+                                { $in: [userId, "$ratings.user"] },
 
-        if (existingRating) {
-            existingRating.value = value;
-        } else {
-            recipe.ratings.push({ user: userId, value });
-        }
+                                {
+                                    $map: {
+                                        input: "$ratings",
+                                        as: "rating",
+                                        in: {
+                                            $cond: [
+                                                { $eq: ["$$rating.user", userId] },
+                                                { $mergeObjects: ["$$rating", { value: value }] },
+                                                "$$rating"
+                                            ]
+                                        }
+                                    }
+                                },
 
-        recipe.ratingsCount = recipe.ratings.length;
-        const total = recipe.ratings.reduce((sum, r) => sum + (Number(r.value) || 0), 0);
-        recipe.avgRating = Number((total / recipe.ratingsCount).toFixed(1));
-        await recipe.save();
+                                {
+                                    $concatArrays: [
+                                        "$ratings",
+                                        [{ user: userId, value: value }]
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    $set: {
+                        ratingsCount: { $size: "$ratings" },
+                        avgRating: {
+                            $cond: [
+                                { $gt: [{ $size: "$ratings" }, 0] },
+                                { $round: [{ $avg: "$ratings.value" }, 1] },
+                                0
+                            ]
+                        }
+                    }
+                }
+            ],
+            {
+                new: true,
+                updatePipeline: true
+            }
+        ).populate("createdBy", "username");
 
-        const populatedRecipe = await Recipe.findById(recipe._id).populate("createdBy", "username");
-        res.json(populatedRecipe);
+        res.json(updatedRecipe);
 
     } catch (error) {
-        res.status(500).json({ error: error.message })
+        res.status(500).json({ error: error.message });
     }
-}
+};
+
+
 
 
 

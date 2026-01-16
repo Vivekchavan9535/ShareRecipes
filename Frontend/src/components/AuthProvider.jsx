@@ -55,7 +55,7 @@ function AuthProvider({ children }) {
 			const user = await axios.get("/user/account", { headers: { Authorization: localStorage.getItem("token") } });
 			console.log(user.data);
 			userDispatch({ type: "LOGIN", payload: user.data })
-			navigate("/");
+			return true;
 		} catch (error) {
 			const msg = error?.response?.data?.error;
 			console.log(msg);
@@ -65,6 +65,7 @@ function AuthProvider({ children }) {
 				autoClose: 2000,
 				theme: "dark",
 			});
+			return false;
 		}
 	}
 
@@ -77,7 +78,7 @@ function AuthProvider({ children }) {
 			resetForm()
 			navigate("/login")
 		} catch (err) {
-			const msg = err?.response?.data
+			const msg = err?.response?.data?.error
 			toast.error(msg, {
 				position: "top-center",
 				autoClose: 2000,
@@ -89,9 +90,13 @@ function AuthProvider({ children }) {
 
 	const handleLogout = () => {
 		try {
-			localStorage.removeItem("token")
-			userDispatch({ type: "LOGOUT" })
-			navigate("/")
+			const confirm = window.confirm("Are you sure to Logout")
+			if (confirm) {
+				localStorage.removeItem("token")
+				localStorage.removeItem("recipeFormDraft");
+				userDispatch({ type: "LOGOUT" })
+				navigate("/")
+			}
 		} catch (error) {
 			console.log(error);
 			userDispatch({ type: "SERVER_ERRORS", payload: error?.response?.data?.error });

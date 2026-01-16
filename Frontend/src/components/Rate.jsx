@@ -6,6 +6,7 @@ import { rateRecipe } from "../slices/recipeSlice";
 import UserContext from "../contexts/userContext";
 
 function Rate({ recipe, userRating }) {
+
     const dispatch = useDispatch();
     const { user } = useContext(UserContext);
 
@@ -28,6 +29,7 @@ function Rate({ recipe, userRating }) {
         <div className="flex flex-col gap-1 items-center bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm">
             <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Rate this recipe</h3>
             <Rating
+                key={userRating}
                 onClick={handleRating}
                 initialValue={userRating || 0}
                 size={25}

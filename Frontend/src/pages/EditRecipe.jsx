@@ -34,7 +34,7 @@ function EditRecipe() {
         try {
             await dispatch(updateRecipe({ id, formData: values })).unwrap();
             toast.success("Recipe updated successfully!");
-            navigate(`/recipe/${id}`);
+            navigate(`/recipes/${id}`);
         } catch (error) {
             toast.error(error || "Failed to update recipe");
         }

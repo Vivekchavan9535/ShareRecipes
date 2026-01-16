@@ -13,9 +13,12 @@ export const fetchRecipes = createAsyncThunk("recipes/fetchRecipes", async (_, {
     }
 })
 
+
 export const searchRecipes = createAsyncThunk("recipes/searchRecipes", async (query, { rejectWithValue }) => {
+
     try {
-        const res = await axios.get(`/recipes/search?q=${query}`)
+        let url = `/recipes/search/?q=${query}`;
+        const res = await axios.get(url)
         return res.data
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || "Something went wrong")
@@ -50,11 +53,14 @@ export const updateRecipe = createAsyncThunk("recipes/updateRecipe", async ({ id
 
 export const deleteRecipe = createAsyncThunk("recipes/deleteRecipe", async (id, { rejectWithValue, dispatch }) => {
     try {
-        const token = localStorage.getItem("token");
-        const res = await axios.delete(`/recipes/${id}`, { headers: { Authorization: token } })
-        dispatch(fetchMyPosts())
-        dispatch(fetchRecipes())
-        return res.data
+        const confirm = window.confirm("Are you sure to Logout")
+        if (confirm) {
+            const token = localStorage.getItem("token");
+            const res = await axios.delete(`/recipes/${id}`, { headers: { Authorization: token } })
+            dispatch(fetchMyPosts())
+            dispatch(fetchRecipes())
+            return res.data
+        }
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || "Failed to delete recipe")
     }
@@ -64,6 +70,8 @@ export const rateRecipe = createAsyncThunk("recipes/rateRecipe", async ({ id, va
     try {
         const token = localStorage.getItem("token")
         const res = await axios.put(`/recipes/${id}/rating`, { value }, { headers: { Authorization: token } })
+        console.log(res);
+
         return res.data
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || "Failed to submit rating")
@@ -117,9 +125,8 @@ const recipes = createSlice({
             })
             .addCase(rateRecipe.fulfilled, (state, action) => {
                 const index = state.data.findIndex(r => r._id === action.payload._id)
-                if (index !== -1) {
-                    state.data[index] = action.payload
-                }
+                state.data[index] = action.payload
+
             })
     }
 })

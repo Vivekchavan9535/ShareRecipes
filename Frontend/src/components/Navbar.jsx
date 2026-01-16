@@ -13,9 +13,9 @@ function Navbar() {
     return (
         <nav className="bg-slate-900/95 backdrop-blur-md text-white z-20 w-full fixed shadow-lg border-b border-white/5">
             <ul className='flex items-center justify-between px-6 py-3'>
-                <div className='flex items-center gap-3'>
+                <div onClick={() => navigate("/")} className='flex items-center gap-3 cursor-pointer'>
                     <li>
-                        <img onClick={() => navigate("/")} className='h-12 cursor-pointer hover:opacity-80 transition-opacity' src={logo} alt="Logo" />
+                        <img className='h-12  hover:opacity-80 transition-opacity' src={logo} alt="Logo" />
                     </li>
                     <li className='text-2xl font-bold italic'>
                         Recipio

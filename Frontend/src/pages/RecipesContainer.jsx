@@ -14,11 +14,12 @@ function RecipesConatiner() {
 
 
     const handleNavigate = (id) => {
+        const detailsPath = `/recipes/${id}`;
         if (localStorage.getItem("token")) {
-            navigate(`/recipe/${id}`)
+            navigate(detailsPath)
         } else {
             toast("Please Login to See Recipe")
-            navigate("/login")
+            navigate(`/login?redirect=${encodeURIComponent(detailsPath)}`)
         }
     }
 
@@ -31,11 +32,13 @@ function RecipesConatiner() {
     }
 
     return (
-        <main className="p-10 pt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <main className="p-10 pt-10">
             {data.length === 0 && <h1 className="text-2xl font-semibold">No Result Found</h1>}
-            {data?.map((recipe) => (
-                <RecipeCard onclick={() => handleNavigate(recipe._id)} key={recipe._id} recipes={recipe} />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {data.map((recipe) => (
+                    <RecipeCard key={recipe._id} recipes={recipe} />
+                ))}
+            </div>
         </main>
     )
 }

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { useState, useContext } from "react";
 import UserContext from "../contexts/userContext"
 
@@ -6,15 +6,21 @@ function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const navigate = useNavigate()
+	const [searchParams] = useSearchParams()
 
-	const isFormValid = email.includes("@") && email.includes(".") && password.trim().length >= 8;
+	const redirect = searchParams.get("redirect") || "/"
+
+	const isFormValid = email.includes("@") && email.includes(".") && password.trim().length >= 5;
 
 	const { handleLogin } = useContext(UserContext);
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!isFormValid) return;
-		handleLogin({ email, password });
+		const ok = await handleLogin({ email, password });
+		if (ok) {
+			navigate(redirect, { replace: true });
+		}
 	}
 
 	return (

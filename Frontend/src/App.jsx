@@ -20,12 +20,11 @@ import EditRecipe from "./pages/EditRecipe";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-	const { isLoggedIn } = useContext(UserContext)
+	const { user, isLoggedIn } = useContext(UserContext)
 	const dispatch = useDispatch()
 
 
 	useEffect(() => {
-		dispatch(fetchRecipes())
 		if (isLoggedIn) {
 			dispatch(fetchMyPosts())
 		}
@@ -60,7 +59,7 @@ function App() {
 					<Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
 					<Route path="/post-recipe" element={<ProtectedRoute><PostRecipe /></ProtectedRoute>} />
 					<Route path='/edit-recipe/:id' element={<ProtectedRoute><EditRecipe /></ProtectedRoute>} />
-					<Route path='/recipe/:id' element={<ProtectedRoute><RecipeDetails /></ProtectedRoute>} />
+					<Route path='/recipes/:id' element={<ProtectedRoute><RecipeDetails /></ProtectedRoute>} />
 				</Routes>
 			</div>
 		</>

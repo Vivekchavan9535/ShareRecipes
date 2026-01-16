@@ -23,9 +23,46 @@ function Login() {
 		}
 	}
 
+
+
+	const demoUsers = [
+		{ label: "Demo User 1", email: "vivekchavan942@gmail.com", password: "vivek123" },
+		{ label: "Demo User 2", email: "jassy@gmail.com", password: "puttu123" },
+		{ label: "Demo User 3", email: "puttu@gmail.com", password: "puttu123" },
+	];
+
+	const handleDemoLogin = async (demo) => {
+		setEmail(demo.email);
+		setPassword(demo.password);
+		const ok = await handleLogin({
+			email: demo.email,
+			password: demo.password,
+		});
+		if (ok) {
+			navigate(redirect, { replace: true });
+		}
+	};
+
 	return (
 		<main className="bg-gray-200 h-screen flex justify-center items-center">
+
 			<form onSubmit={(e) => handleSubmit(e)} className="h-100 w-100 bg-gray-300 rounded-[30px] flex gap-3 flex-col justify-center items-center" >
+
+				{/* Demo Login */}
+				<div className="w-[80%] flex gap-2 text-sm" >
+					{demoUsers.map((demo) => (
+						<button
+							key={demo.email}
+							type="button"
+							onClick={() => handleDemoLogin(demo)}
+							className="w-full bg-green-600 hover:bg-emerald-700 text-white py-2 rounded font-semibold"
+						>
+							{demo.label}
+						</button>
+					))}
+				</div>
+
+
 				<div>
 					<h1 className="font-bold text-3xl">Login</h1>
 				</div>

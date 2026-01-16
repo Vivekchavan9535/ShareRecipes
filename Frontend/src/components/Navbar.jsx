@@ -8,6 +8,7 @@ import profileImg from "../assets/profileImg.png"
 function Navbar() {
     const navigate = useNavigate()
     const { isLoggedIn, handleLogout } = useContext(UserContext);
+    const token = localStorage.getItem("token")
 
 
     return (
@@ -26,13 +27,13 @@ function Navbar() {
                 </li>
 
                 <div className='flex items-center gap-6 '>
-                    {isLoggedIn && (
+                    {token && (
                         <div onClick={() => navigate("/profile")} className='h-10 w-10 ring-2 ring-emerald-500/20 rounded-full overflow-hidden cursor-pointer hover:ring-emerald-500/50 transition-all'>
                             <img className='h-full w-full object-cover' src={profileImg} alt="Profile" />
                         </div>
                     )}
                     <li className=''>
-                        {isLoggedIn ? (
+                        {token ? (
                             <button
                                 onClick={handleLogout}
                                 className="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2 rounded-full font-bold text-sm transition-all shadow-md active:scale-95"

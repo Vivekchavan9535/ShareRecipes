@@ -20,6 +20,7 @@ const userReducer = (state, action) => {
 	}
 }
 
+
 function AuthProvider({ children }) {
 	const [userState, userDispatch] = useReducer(userReducer, { user: null, isLoggedIn: false, serverErrors: "", loading: true });
 	const navigate = useNavigate()
